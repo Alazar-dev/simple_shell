@@ -1,8 +1,9 @@
-.TH man "SIMPLE_SHELL"
+.TH man 1 "14 Nov 2020" "ALX-HOLBERTON" "SIMPLE_SHELL"
 .SH NAME
 .B simple_shell
 - a simple UNIX command interpreter
 .SH SYNOPSIS
+.B #include \(dqholberton.h\(dq
 .sp
 .B int hsh(void)
 .SH DESCRIPTION
@@ -76,6 +77,8 @@ The primary prompt string, which defaults to “$ ”
 .SH FILES
 .SH HISTORY
 .SH BUGS
-.ip Expansions only work once per stdin read
+.ip Expansions work once per stdin read only
 .SH AUTHOR
-Ademola Glory and Emmanuel Murairi
+Musa Kanneh and Obutho Odhiambo
+.SH SEE ALSO
+.BR sh (1)
