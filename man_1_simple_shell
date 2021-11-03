@@ -1,56 +1,86 @@
-.TH HSH 1
-.SH NAME
-hsh \- Holberton Shell	
-.SH SYNOPSIS
-.B hsh
-[command] [options ...]
-.SH COPYRIGHT
-hsh \- is a holberton school first trimester project
-.SH DESCRIPTION
-.B hsh
-is a shell command interpreter that executes command read from the standard input or from file.
-.B hsh
-is intend to be a clone of the standard command interpreter of 
-.B Unix
-and 
-.B Unix-like
-system.
-.SH OPTIONS
-A  simple command is a sequence of optional variable assignments followed by blank-separated words and redirections, 
-and terminated by a control operator.  The first word specifies the command to be
-executed, and is passed as argument zero.  The remaining words are passed as arguments to the invoked command.
-.PP
-The return value of a simple command is its exit status, or 128+n if the command is terminated by signal n.
-.SS
-Piplines
-A pipeline is a sequence of one or more commands separated by one of the control operators | or |&.  The format for a pipeline is:
-.PP
-[command [..ARGS]] [| - |&] [command2 [..ARGS]]
-.PP
-The standard output of command is connected via a pipe to the standard input of command2.  This connection is performed before any redirections specified by the command (see REDIRECTION below).   If
-|&  is  used,  command's standard error, in addition to its standard output, is connected to command2's standard input through the pipe; it is shorthand for 2>&1 |.  This implicit redirection of the
-standard error to the standard output is performed after any redirections specified by the command.
-.SS Lists
+.TH General Bark 1 "14 November 2020" "version 1.0" "Programmer's Manual"
 
-A list is a sequence of one or more pipelines separated by one of the operators ;, &, &&, or ||, and optionally terminated by one of ;, &, or <newline>.
-Of these list operators, && and || have equal precedence, followed by ; and &, which have equal precedence.
-A sequence of one or more newlines may appear in a list instead of a semicolon to delimit commands.
+.SH NAME
+.B General bark (GBK)
+- command interpreter (shell)
+
+.SH SYNOPSIS
 .PP
-If  a command is terminated by the control operator &, the shell executes the command in the background in a subshell.  The shell does not wait for the command to finish, and the return status is 0.
-Commands separated by a ; are executed sequentially; the shell waits for each command to terminate in turn.  The return status is the exit status of the last command executed.
-AND and OR lists are sequences of one or more pipelines separated by the && and || control operators, respectively.  AND and OR lists are executed with left associativity.  An AND list has the form
+.B ./gbk [command_string | file]
+
 .PP
-command1 && command2
+.B 
+.SH DESCRIPTION
+General Bark is a shell on top of the Kernal, hence the title general. Its task is to wrap around the Kernal and make interaction more civil, hence the name Bark, like the tree bark. The general takes most of the basics of commands that are present in the bash shell and communicate them to the Kernal in a soldierly manner. This is shell is built as part of a learning C.
+
+General works like the bash and other basic C shells, though it has some to be yet build features.
 .PP
-command2 is executed if, and only if, command1 returns an exit status of zero.
+.SH EXAMPLE:
+ls -a
+ . .. other_files
+
 .PP
-An OR list has the form:
+
+.SH BUILTINS
+The general knows a couple of builtin commands. it also integrates with other commands \
+that can be located in the PATH. The output of General Bark is to replicate \
+exactly as the shell 'sh' or 'bash'.
+
+|----------|--------------------------------------------|
+
+|`alias`   | to create aliases                          |
+
+|`help`    | to get help on built-in functions          |
+
+|`cd`      | change working directories                 |
+
+|`history` | list of commands typed in the past         |
+
+|`[print]env`| prints environmental variables           |
+
+|`set`     | sets new environmental variables           |
+
+|`exit`    | exit out of gbk                            |
+
+|`unset`   | unsets envrionmental variables             |
+
+|----------|--------------------------------------------|
+
 .PP
-command1 || command2
+.B $ man bash
+. General Bark\
+General Bark takes commands from files, shell scripts and user input in both interactive or non-interactive mode.
+
+.SH INITIALIZATION ADN INVOCATION
+To work with the general the user needs to compile \
+using: gcc. The run the output file by calling it  \
+by the output name it was given. 
 .PP
-command2 is executed if and only if command1 returns a non-zero exit status.  The return status of AND and OR lists is the exit status of the last command executed in the list.
+.B EX: $ ./some_name or $ ./a.out
+.PP
+The general will compile with the following:
+gcc -Wall -Wextra -Werror -pedantic *.c -o gbk
+
+
+.PP
+If the user inputs piplines or calls  non-interactive mode the general should\
+funciton and execute said commands. An example of non-interactive mode input:
+.PP
+.B $ echo 'ls -a' | ./gbk
+.PP
+.PP
+Another example of non interactive mode:
+.PP
+.B $ cat some_file | ./gbk
+.PP
+
+.B
+.PP
+.SH OPTION
+currently no options are supported
+.SH SEE ALSO
+.I Nothing else
+.SH BUGS
+No Known Bugs
 .SH AUTHORS
-Sebri Issam \- Holberton School Software Engineer Student
-.SH VERSIONS
-.B hsh
-V1.0.0
+.B Hileamlak && Anthony

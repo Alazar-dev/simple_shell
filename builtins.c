@@ -1,130 +1,93 @@
-#include "shell.h"
+#include "gbk.h"
+#define l(x) _strlen((x))
 
-#define SETOWD(V) (V = _strdup(_getenv("OLDPWD")))
 /**
- * change_dir - changes directory
- * @data: a pointer to the data structure
- *
- * Return: (Success) 0 is returned
- * ------- (Fail) negative number will returned
- */
-int change_dir(sh_t *data)
+*handle_exit - decides exit code
+*@cmd: list of args
+*Return: exit code
+*/
+int handle_exit(char **cmd)
 {
-	char *home;
+	int exitstatus = 0, i = 0, str_in = 0;
+	char *ermsg;
 
-	home = _getenv("HOME");
-	if (data->args[1] == NULL)
+	if (cmd[1])
 	{
-		SETOWD(data->oldpwd);
-		if (chdir(home) < 0)
-			return (FAIL);
-		return (SUCCESS);
-	}
-	if (_strcmp(data->args[1], "-") == 0)
-	{
-		if (data->oldpwd == 0)
+		while (cmd[1][i])
 		{
-			SETOWD(data->oldpwd);
-			if (chdir(home) < 0)
-				return (FAIL);
+			if (!('0' <= cmd[1][i] && '9' >= cmd[1][i]))
+				str_in = 1;
+			i++;
+		}
+		ermsg = smalloc(l("exit: Illegal number: ") + l(cmd[1]) + 4);
+		_strcpy(ermsg, "exit: Illegal number: ");
+		_strcat(ermsg, cmd[1]);
+
+		if (str_in)
+		{
+			errno = -1;
+			perr(NULL, NULL, ermsg);
+			exitstatus = 2;
+
+		}
+		else if (_atoi(cmd[1]) < 0)
+		{
+			errno = -1;
+			perr(NULL, NULL, ermsg);
+			exitstatus = 2;
 		}
 		else
-		{
-			SETOWD(data->oldpwd);
-			if (chdir(data->oldpwd) < 0)
-				return (FAIL);
-		}
-	}
-	else
-	{
-		SETOWD(data->oldpwd);
-		if (chdir(data->args[1]) < 0)
-			return (FAIL);
-	}
-	return (SUCCESS);
-}
-#undef GETCWD
-/**
- * abort_prg - exit the program
- * @data: a pointer to the data structure
- *
- * Return: (Success) 0 is returned
- * ------- (Fail) negative number will returned
- */
-int abort_prg(sh_t *data __attribute__((unused)))
-{
-	int code, i = 0;
+			exitstatus = _atoi(cmd[1]) % 256;
 
-	if (data->args[1] == NULL)
-	{
-		free_data(data);
-		exit(errno);
+		free(ermsg);
 	}
-	while (data->args[1][i])
-	{
-		if (_isalpha(data->args[1][i++]) < 0)
-		{
-			data->error_msg = _strdup("Illegal number\n");
-			return (FAIL);
-		}
-	}
-	code = _atoi(data->args[1]);
-	free_data(data);
-	exit(code);
+	return (exitstatus);
 }
 /**
- * display_help - display the help menu
- * @data: a pointer to the data structure
- *
- * Return: (Success) 0 is returned
- * ------- (Fail) negative number will returned
+ *handlebin - handles builtin commands
+ *@cmd: command arguements
+ *@head: head of the alias list
+ *Return: 0 if builting commond executed or 1 if not
  */
-int display_help(sh_t *data)
+int *handlebin(char **cmd, alias **head)
 {
-	int fd, fw, rd = 1;
-	char c;
+	int *ret = smalloc(2 * sizeof(int));
 
-	fd = open(data->args[1], O_RDONLY);
-	if (fd < 0)
+	ret[0] = 1, ret[1] = 266;
+	if (!cmd)
+		return (ret);
+	if (!_strcmp(cmd[0], "exit"))
+		ret[0] = 0, ret[1] = handle_exit(cmd);
+	else if (!_strcmp(cmd[0], "env") || !_strcmp(cmd[0], "printenv"))
+		_printenv(), ret[0] = 0;
+	else if (!_strcmp(cmd[0], "\n"))
+		ret[0] = 0;
+	else if (!_strcmp(cmd[0], "setenv"))
 	{
-		data->error_msg = _strdup("no help topics match\n");
-		return (FAIL);
+		if (arlen(cmd) != 3)
+			errno = -2, perr(NULL, NULL, "Too few or too many arguements");
+		else
+			_setenv(cmd[1], cmd[2], 0);
+		ret[0] = 0;
 	}
-	while (rd > 0)
+	else if (!_strcmp(cmd[0], "unsetenv"))
 	{
-		rd = read(fd, &c, 1);
-		fw = write(STDOUT_FILENO, &c, rd);
-		if (fw < 0)
-		{
-			data->error_msg = _strdup("cannot write: permission denied\n");
-			return (FAIL);
-		}
+		if (arlen(cmd) != 2)
+			errno = -2, perr(NULL, NULL, "Too few or too many arguements");
+		else
+			_unsetenv(cmd[1]);
+		ret[0] = 0;
 	}
-	PRINT("\n");
-	return (SUCCESS);
-}
-/**
- * handle_builtin - handle and manage the builtins cmd
- * @data: a pointer to the data structure
- *
- * Return: (Success) 0 is returned
- * ------- (Fail) negative number will returned
- */
-int handle_builtin(sh_t *data)
-{
-	blt_t blt[] = {
-		{"exit", abort_prg},
-		{"cd", change_dir},
-		{"help", display_help},
-		{NULL, NULL}
-	};
-	int i = 0;
+	else if (!_strcmp(cmd[0], "cd"))
+		_chdir(arlen(cmd) > 1 ? cmd[1] : NULL),	ret[0] = 0;
+	else if (!_strcmp(cmd[0], "history"))
+		phistory(), ret[0] = 0;
+	else if (!_strcmp(cmd[0], "help"))
+		phelp(arlen(cmd) > 1 ? cmd[1] : NULL),	ret[0] = 0;
+	else if (!_strcmp(cmd[0], "alias"))
+		handle_alias(cmd, head), ret[0] = 0;
 
-	while ((blt + i)->cmd)
-	{
-		if (_strcmp(data->args[0], (blt + i)->cmd) == 0)
-			return ((blt + i)->f(data));
-		i++;
-	}
-	return (FAIL);
+	if (!ret[0] && ret[1] == 266)
+		freedp(cmd);
+	return (ret);
 }
