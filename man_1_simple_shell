@@ -1,86 +1,81 @@
-.TH General Bark 1 "14 November 2020" "version 1.0" "Programmer's Manual"
-
+.TH man "SIMPLE_SHELL"
 .SH NAME
-.B General bark (GBK)
-- command interpreter (shell)
-
+.B simple_shell
+- a simple UNIX command interpreter
 .SH SYNOPSIS
-.PP
-.B ./gbk [command_string | file]
-
-.PP
-.B 
+.sp
+.B int hsh(void)
 .SH DESCRIPTION
-General Bark is a shell on top of the Kernal, hence the title general. Its task is to wrap around the Kernal and make interaction more civil, hence the name Bark, like the tree bark. The general takes most of the basics of commands that are present in the bash shell and communicate them to the Kernal in a soldierly manner. This is shell is built as part of a learning C.
-
-General works like the bash and other basic C shells, though it has some to be yet build features.
-.PP
-.SH EXAMPLE:
-ls -a
- . .. other_files
-
-.PP
-
-.SH BUILTINS
-The general knows a couple of builtin commands. it also integrates with other commands \
-that can be located in the PATH. The output of General Bark is to replicate \
-exactly as the shell 'sh' or 'bash'.
-
-|----------|--------------------------------------------|
-
-|`alias`   | to create aliases                          |
-
-|`help`    | to get help on built-in functions          |
-
-|`cd`      | change working directories                 |
-
-|`history` | list of commands typed in the past         |
-
-|`[print]env`| prints environmental variables           |
-
-|`set`     | sets new environmental variables           |
-
-|`exit`    | exit out of gbk                            |
-
-|`unset`   | unsets envrionmental variables             |
-
-|----------|--------------------------------------------|
-
-.PP
-.B $ man bash
-. General Bark\
-General Bark takes commands from files, shell scripts and user input in both interactive or non-interactive mode.
-
-.SH INITIALIZATION ADN INVOCATION
-To work with the general the user needs to compile \
-using: gcc. The run the output file by calling it  \
-by the output name it was given. 
-.PP
-.B EX: $ ./some_name or $ ./a.out
-.PP
-The general will compile with the following:
-gcc -Wall -Wextra -Werror -pedantic *.c -o gbk
-
-
-.PP
-If the user inputs piplines or calls  non-interactive mode the general should\
-funciton and execute said commands. An example of non-interactive mode input:
-.PP
-.B $ echo 'ls -a' | ./gbk
-.PP
-.PP
-Another example of non interactive mode:
-.PP
-.B $ cat some_file | ./gbk
-.PP
-
-.B
-.PP
-.SH OPTION
-currently no options are supported
-.SH SEE ALSO
-.I Nothing else
+.B Overview
+.sp
+The simple shell is an application that reads lines from either a file or the
+terminal, interprets them, and executes them. Users can interactively type directly
+to the
+running shell or pipe in shell scripts.
+.sp
+.B Invocation
+.sp
+If no args are present and if the standard input of the shell is connected to a
+terminal, the shell is considered an interactive shell.  An interactive shell prompts
+before each command and handles programming and command errors differently.
+.sp
+.B Builtins
+.sp
+This section lists the builtin commands which are builtin because they need to perform
+some operation that can't be performed by a separate process.
+.sp
+.IP "-exit [status]"
+.sp
+Terminate the shell process. If status is given, it is used as the exit status of
+the shell; otherwise the exit status of the preceding command is used.
+.sp
+.IP "-help [builtin]"
+.sp
+Retrieve informational text on how use builtin
+.sp
+.IP "-unsetenv [variable]"
+.sp
+Unsets an environmental varibale of name [variable]
+.sp
+.IP "-setenv [key] [value]"
+.sp
+Set a local environmental variable with key-value pair. If key already exists, this
+action will replace the existing key with new value.
+.sp
+.IP "-cd [directory]"
+.sp
+Change working current directory to target directory. If "-" is inputted as second
+argument, it will change to last working directory. If ".." is inputted, it will
+take user to parent directory. If input is omitted, then user is take to $HOME.
+.sp
+.IP "-alias"
+.sp
+Work in progress in current version.
+.sp
+.IP "-history"
+.sp
+Work in progress in current version.
+.sp
+.SH EXIT STATUS
+.sp
+Errors that are detected by the shell, such as a syntax error, will cause the shell to
+exit with a non-zero exit status. Otherwise the shell will return the exit status of
+the last command executed, or if the exit builtin is used with a numeric argument,
+it will return the argument.
+.sp
+.SH ENVIRONMENT
+.sp
+.IP HOME
+User's login directory
+.sp
+.IP PATH
+The default search path for executables
+.sp
+.IP PS1
+The primary prompt string, which defaults to “$ ”
+.SH FILES
+.SH HISTORY
 .SH BUGS
-No Known Bugs
-.SH AUTHORS
-.B Hileamlak && Anthony
+.ip Expansions only work once per stdin read
+.SH AUTHOR
+Ademola Glory and Emmanuel Murairi
